@@ -31,6 +31,24 @@ export default {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        "status-present": {
+          DEFAULT: "hsl(var(--status-present))",
+          foreground: "hsl(var(--status-present-foreground))",
+          light: "hsl(var(--status-present-light))",
+        },
+        "status-absent": {
+          DEFAULT: "hsl(var(--status-absent))",
+          foreground: "hsl(var(--status-absent-foreground))",
+          light: "hsl(var(--status-absent-light))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
