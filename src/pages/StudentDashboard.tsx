@@ -10,12 +10,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Student,
-  hasMarkedAttendanceToday,
-  saveAttendanceRecord,
-  getTodayString,
-} from "@/lib/mockData";
 import { LogOut } from "lucide-react";
 
 const StudentDashboard: React.FC = () => {
@@ -31,31 +25,15 @@ const StudentDashboard: React.FC = () => {
   const [attendanceMarked, setAttendanceMarked] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const student = user as Student;
-
-  // ======================
-  // INITIAL CHECK
-  // ======================
-  useEffect(() => {
-    if (student) {
-      setAttendanceMarked(hasMarkedAttendanceToday(student.id));
-    }
-  }, [student]);
-
   useEffect(() => {
     if (userType !== "student") {
       navigate("/");
     }
   }, [userType, navigate]);
 
-  // ======================
-  // START CAMERA
-  // ======================
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -70,9 +48,6 @@ const StudentDashboard: React.FC = () => {
     }
   };
 
-  // ======================
-  // STOP CAMERA
-  // ======================
   const stopCamera = () => {
     const stream = videoRef.current?.srcObject as MediaStream | null;
     stream?.getTracks().forEach((track) => track.stop());
@@ -84,9 +59,6 @@ const StudentDashboard: React.FC = () => {
     setIsCameraOpen(false);
   };
 
-  // ======================
-  // CAPTURE IMAGE
-  // ======================
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -110,24 +82,21 @@ const StudentDashboard: React.FC = () => {
     stopCamera();
   };
 
-  // ======================
-  // VERIFY FACE (CORRECT ENDPOINT)
-  // ======================
   const verifyFace = async () => {
-    if (!capturedImage || !student) return;
+    if (!capturedImage || !user) return;
 
     try {
       setIsVerifying(true);
 
       const res = await fetch(
-        "http://localhost:5000/api/face/login",
+        "http://localhost:5000/api/face-attendance",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: student.email || student.rollNumber,
+            email: user.email,
             image: capturedImage,
           }),
         }
@@ -135,26 +104,16 @@ const StudentDashboard: React.FC = () => {
 
       const data = await res.json();
 
-      console.log("Face response:", data);
+console.log("FULL FACE RESPONSE:", JSON.stringify(data, null, 2));
 
-      if (!data.success) {
-        throw new Error("Face mismatch");
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Face mismatch");
       }
-
-      // Save attendance
-      saveAttendanceRecord({
-        studentId: student.id,
-        date: getTodayString(),
-        markedAt: new Date().toISOString(),
-        status: "present",
-        verificationMethod: "face",
-        locationVerified: true,
-      });
 
       setAttendanceMarked(true);
 
       toast({
-        title: "Face matched ✓",
+        title: "Attendance marked successfully ✓",
       });
     } catch (error) {
       toast({
@@ -171,7 +130,7 @@ const StudentDashboard: React.FC = () => {
     navigate("/");
   };
 
-  if (!student) return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen p-6">

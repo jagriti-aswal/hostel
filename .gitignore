@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python virtual environment
+backend/face-service/venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Dataset (optional if large)
+backend/face-service/dataset/
+
+# Pickle files (recommended)
+*.pkl
+
+# Node modules
+node_modules/
+
+# Environment variables
+.env
