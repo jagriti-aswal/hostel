@@ -47,6 +47,7 @@ export const markFaceAttendance = async (req, res) => {
         live_image: image,
       }
     );
+    console.log("FACE VERIFY RESPONSE:", response.data);
 
     if (!response.data.success) {
       return res.status(401).json({

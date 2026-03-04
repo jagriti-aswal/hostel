@@ -27,8 +27,9 @@ def base64_to_image(image_base64):
 
     img_bytes = base64.b64decode(image_base64)
     img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+    
     frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
+    frame = cv2.resize(frame, (640, 480))
     if frame is None:
         raise ValueError("Image decoding failed")
 
@@ -56,15 +57,16 @@ def verify_face():
 
         # 🔥 Face Verification
         result = DeepFace.verify(
-            img1_path=img1,
-            img2_path=img2,
-            model_name="Facenet",
-            enforce_detection=False,
-            distance_metric="cosine"
-        )
+    img1_path=img1,
+    img2_path=img2,
+    model_name="Facenet",
+    detector_backend="retinaface",
+    enforce_detection=True,
+    distance_metric="cosine"
+)
 
         # 🔥 Custom threshold (you can tune this)
-        custom_threshold = 0.75
+        custom_threshold = 0.55
 
         is_match = result["distance"] < custom_threshold
 
@@ -75,10 +77,9 @@ def verify_face():
         })
 
     except Exception as e:
-        print("Face verification error:", str(e))
         return jsonify({
             "success": False,
-            "message": str(e)
+            "message": "Face not detected"
         })
 
 
