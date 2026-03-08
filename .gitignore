@@ -42,3 +42,11 @@ node_modules/
 
 # Environment variables
 .env
+
+
+venv/
+ml/venv/
+node_modules/
+__pycache__/
+*.pyc
+.env
