@@ -973,9 +973,14 @@ const handleAddStudent = async () => {
                               src={s.profilePhoto}
                               className="w-9 h-9 rounded-full"
                             /> */}
-                            <img
+                            {/* <img
   src={`http://localhost:5000${s.photo}`}
   className="w-9 h-9 rounded-full"
+/> */}
+<img
+  src={s.photo}
+  className="w-9 h-9 rounded-full"
+  alt={s.name}
 />
                             <div>
                               <p className="font-medium">{s.name}</p>

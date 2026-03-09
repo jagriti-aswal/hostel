@@ -32,21 +32,46 @@ export const markFaceAttendance = async (req, res) => {
     }
 
     // 2️⃣ Read stored image
-    const storedImagePath = "." + user.photo;
-    const imageBuffer = fs.readFileSync(storedImagePath);
+    // const storedImagePath = "." + user.photo;
+    // const imageBuffer = fs.readFileSync(storedImagePath);
 
-    const storedBase64 =
-      "data:image/jpeg;base64," +
-      imageBuffer.toString("base64");
-
+    // const storedBase64 =
+    //   "data:image/jpeg;base64," +
+    //   imageBuffer.toString("base64");
+        
     // 3️⃣ Send both images to Python
-    const response = await axios.post(
+    // 2️⃣ Read stored image
+
+    
+// const storedImagePath = "." + user.photo;
+// const imageBuffer = fs.readFileSync(storedImagePath);
+
+// const storedBase64 =
+//   "data:image/jpeg;base64," +
+//   imageBuffer.toString("base64");
+//     const response = await axios.post(
+//       "http://127.0.0.1:5001/verify-face",
+//       {
+//         stored_image: storedBase64,
+//         live_image: image,
+//       }
+//     );
+    //  console.log("FACE VERIFY RESPONSE:", response.data);
+
+//     if (!response.data.success) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Face not matched",
+//       });
+//     }
+ const response = await axios.post(
       "http://127.0.0.1:5001/verify-face",
       {
-        stored_image: storedBase64,
-        live_image: image,
+        stored_image: user.photo, // Supabase URL
+        live_image: image,        // webcam base64
       }
     );
+
     console.log("FACE VERIFY RESPONSE:", response.data);
 
     if (!response.data.success) {
@@ -55,7 +80,6 @@ export const markFaceAttendance = async (req, res) => {
         message: "Face not matched",
       });
     }
-
     // 4️⃣ Mark attendance
    await Attendance.create({
   student: user._id,   // ✅ THIS IS REQUIRED

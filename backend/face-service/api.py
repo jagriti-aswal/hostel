@@ -79,10 +79,19 @@ app.add_middleware(
 )
 
 class FaceLoginRequest(BaseModel):
-    username: str
-    image: str
+    # username: str
+    # image: str
+    stored_image: str
+    live_image: str
 
+
+# @app.post("/face/login")
+# def face_login(data: FaceLoginRequest):
+#     return verify_face_from_base64(data.username, data.image)
 
 @app.post("/face/login")
 def face_login(data: FaceLoginRequest):
-    return verify_face_from_base64(data.username, data.image)
+    return verify_face_from_base64(
+        data.stored_image,
+        data.live_image
+    )

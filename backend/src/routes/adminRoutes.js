@@ -91,10 +91,54 @@ import User from "../models/User.js";
 import upload from "../middleware/upload.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { adminOnly } from "../middleware/adminOnly.js";
-
+import supabase from "../config/supabase.js";
+import fs from "fs";
 const router = express.Router();
 
 /* ================= ADD STUDENT ================= */
+
+// router.post(
+//   "/students",
+//   protect,
+//   adminOnly,
+//   upload.single("photo"),
+//   async (req, res) => {
+//     try {
+//       const { name, email, password, rollNumber, roomNumber } = req.body;
+
+//       if (!name || !email || !password || !rollNumber || !roomNumber) {
+//         return res.status(400).json({ message: "Missing required fields" });
+//       }
+
+//       // Check if email already exists
+//       const existing = await User.findOne({ email });
+//       if (existing) {
+//         return res.status(400).json({ message: "Email already exists" });
+//       }
+
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       const student = await User.create({
+//         name,
+//         email,
+//         password: hashedPassword,
+//         rollNumber,
+//         roomNumber,
+//         role: "student",
+//         photo: req.file ? `/uploads/students/${req.file.filename}` : "",
+//       });
+
+//       res.status(201).json({
+//         message: "Student added successfully",
+//         student,
+//       });
+//     } catch (err) {
+//       console.error("ADD STUDENT ERROR 👉", err);
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
 
 router.post(
   "/students",
@@ -103,19 +147,29 @@ router.post(
   upload.single("photo"),
   async (req, res) => {
     try {
+
       const { name, email, password, rollNumber, roomNumber } = req.body;
 
-      if (!name || !email || !password || !rollNumber || !roomNumber) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      // Check if email already exists
-      const existing = await User.findOne({ email });
-      if (existing) {
-        return res.status(400).json({ message: "Email already exists" });
-      }
-
       const hashedPassword = await bcrypt.hash(password, 10);
+
+      let photoUrl = "";
+
+      if (req.file) {
+
+        const fileBuffer = fs.readFileSync(req.file.path);
+
+        const fileName = `${Date.now()}-${req.file.originalname}`;
+
+        const { data, error } = await supabase.storage
+          .from("students")
+          .upload(fileName, fileBuffer, {
+            contentType: req.file.mimetype,
+          });
+
+        if (error) throw error;
+
+        photoUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/students/${fileName}`;
+      }
 
       const student = await User.create({
         name,
@@ -124,20 +178,17 @@ router.post(
         rollNumber,
         roomNumber,
         role: "student",
-        photo: req.file ? `/uploads/students/${req.file.filename}` : "",
+        photo: photoUrl,
       });
 
-      res.status(201).json({
-        message: "Student added successfully",
-        student,
-      });
+      res.status(201).json(student);
+
     } catch (err) {
-      console.error("ADD STUDENT ERROR 👉", err);
-      res.status(500).json({ message: "Server error" });
+      console.error("UPLOAD ERROR 👉", err);
+      res.status(500).json({ message: err.message });
     }
   }
 );
-
 /* ================= GET ALL STUDENTS ================= */
 
 router.get("/students", protect, adminOnly, async (req, res) => {

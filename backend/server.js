@@ -1,5 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
+
+dotenv.config();
+
 import cors from "cors";
 import path from "path";
 
@@ -7,11 +10,11 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import faceAuthRoutes from "./src/routes/faceAuth.routes.js";
+import uploadRoutes from "./src/routes/uploadRoutes.js";
 
-dotenv.config();
 
 const app = express();
-
+app.use("/api", uploadRoutes);
 // ==========================
 // CORS
 // ==========================
