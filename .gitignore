@@ -51,4 +51,5 @@ __pycache__/
 *.pyc
 .env
 
+.env
 backend/.env
