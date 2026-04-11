@@ -27,7 +27,7 @@ export default function FacePreview() {
     const imageBase64 = canvas.toDataURL("image/jpeg");
 
     // Send to backend
-    const res = await fetch("http://localhost:5000/api/face/login", {
+    const res = await fetch("https://hostel-tprs.onrender.com/api/face/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -103,7 +103,7 @@
 
 // const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// const API_URL = "http://localhost:5000/api/auth";
+// const API_URL = "https://hostel-tprs.onrender.com/api/auth";
 
 // export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 //   children,
@@ -239,7 +239,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     type: "student" | "admin"
   ): Promise<boolean> => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("https://hostel-tprs.onrender.com/api/auth/login", {
         email,
         password,
       });

@@ -73,7 +73,7 @@ const [filter, setFilter] = useState("all");
       const token = localStorage.getItem("token");
      // console.log("TOKEN:", localStorage.getItem("token"));
       const res = await axios.get(
-        "http://localhost:5000/api/admin/students",
+        "https://hostel-tprs.onrender.com/api/admin/students",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ const [filter, setFilter] = useState("all");
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/admin/attendance",
+        "https://hostel-tprs.onrender.com/api/admin/attendance",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -193,7 +193,7 @@ const handleAddStudent = async () => {
 
     if (photo) data.append("photo", photo);
 
-    await axios.post("http://localhost:5000/api/admin/students", data, {
+    await axios.post("https://hostel-tprs.onrender.com/api/admin/students", data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -357,7 +357,7 @@ const handleAddStudent = async () => {
                               className="w-9 h-9 rounded-full"
                             /> */}
                             {/* <img
-  src={`http://localhost:5000${s.photo}`}
+  src={`https://hostel-tprs.onrender.com${s.photo}`}
   className="w-9 h-9 rounded-full"
 /> */}
 <img

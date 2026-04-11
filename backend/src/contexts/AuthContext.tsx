@@ -11,7 +11,7 @@
 //     try {
 //       console.log("🌐 SENDING API REQUEST...");
 
-//       const res = await fetch("http://localhost:5000/api/auth/login", {
+//       const res = await fetch("https://hostel-tprs.onrender.com/api/auth/login", {
         
 //         method: "POST",
 //         headers: {
@@ -70,7 +70,7 @@ const login = async (
   type: "student" | "admin"
 ) => {
   try {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+    const res = await fetch("https://hostel-tprs.onrender.com/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -148,7 +148,7 @@ const login = async (
 //     type: "student" | "admin"
 //   ) => {
 //     try {
-//       const res = await fetch("http://localhost:5000/api/auth/login", {
+//       const res = await fetch("https://hostel-tprs.onrender.com/api/auth/login", {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
