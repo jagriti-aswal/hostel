@@ -1,3 +1,7 @@
+import axios from "axios";
+import User from "../models/User.js";
+import Attendance from "../models/Attendance.js";
+import * as geolib from "geolib";  // ✅ ADD THIS
 export const markFaceAttendance = async (req, res) => {
   try {
     const { email, image, latitude, longitude } = req.body;
