@@ -5,6 +5,9 @@ export const markFaceAttendance = async (req, res) => {
     console.log("Student Latitude:", latitude);
     console.log("Student Longitude:", longitude);
 
+    // ==========================
+    // ❗ VALIDATION
+    // ==========================
     if (!email || !image) {
       return res.status(400).json({
         success: false,
@@ -13,21 +16,25 @@ export const markFaceAttendance = async (req, res) => {
     }
 
     // ==========================
-    // 📍 LOCATION CHECK (OPTIONAL ENABLE)
+    // 📍 LOCATION CHECK
     // ==========================
     if (latitude && longitude) {
-      const distance = geolib.getDistance(
-        { latitude, longitude },
-        { latitude: COLLEGE_LAT, longitude: COLLEGE_LON }
-      );
+      try {
+        const distance = geolib.getDistance(
+          { latitude: Number(latitude), longitude: Number(longitude) },
+          { latitude: COLLEGE_LAT, longitude: COLLEGE_LON }
+        );
 
-      console.log("Distance from hostel:", distance);
+        console.log("Distance from hostel:", distance);
 
-      if (distance > MAX_DISTANCE) {
-        return res.status(403).json({
-          success: false,
-          message: "Outside hostel area",
-        });
+        if (distance > MAX_DISTANCE) {
+          return res.status(403).json({
+            success: false,
+            message: "Outside hostel area",
+          });
+        }
+      } catch (err) {
+        console.error("Location error:", err.message);
       }
     }
 
@@ -43,35 +50,53 @@ export const markFaceAttendance = async (req, res) => {
       });
     }
 
-    if (!user.photo) {
+    if (!user.photo || !user.photo.startsWith("http")) {
       return res.status(400).json({
         success: false,
-        message: "No stored photo",
+        message: "Invalid stored photo",
       });
     }
 
     // ==========================
-    // 🧹 CLEAN BASE64 (IMPORTANT FIX)
+    // 🧹 CLEAN BASE64
     // ==========================
     let cleanBase64 = image;
 
-    if (image.startsWith("data:image")) {
+    if (typeof image === "string" && image.startsWith("data:image")) {
       cleanBase64 = image.split(",")[1];
     }
 
-    console.log("Stored Image URL:", user.photo);
+    if (!cleanBase64 || cleanBase64.length < 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image data",
+      });
+    }
+
+    console.log("Stored Image:", user.photo);
     console.log("Live Image Length:", cleanBase64.length);
 
     // ==========================
     // 🤖 FACE VERIFY API
     // ==========================
-    const response = await axios.post(
-      "https://jagriti-aswal-face-auth-api.hf.space/face/login",
-      {
-        stored_image: user.photo,
-        live_image: cleanBase64, // ✅ FIXED
-      }
-    );
+    let response;
+
+    try {
+      response = await axios.post(
+        "https://jagriti-aswal-face-auth-api.hf.space/face/login",
+        {
+          stored_image: user.photo,
+          live_image: cleanBase64,
+        }
+      );
+    } catch (err) {
+      console.error("ML API ERROR:", err.response?.data || err.message);
+
+      return res.status(500).json({
+        success: false,
+        message: "Face verification service failed",
+      });
+    }
 
     console.log("FACE VERIFY RESPONSE:", response.data);
 
@@ -110,7 +135,8 @@ export const markFaceAttendance = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Face attendance error:", error);
+    console.error("Face attendance error:", error.message);
+
     return res.status(500).json({
       success: false,
       message: "Server error",
