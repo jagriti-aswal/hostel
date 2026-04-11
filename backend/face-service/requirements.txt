@@ -1,5 +1,7 @@
-fastapi
-uvicorn
+flask
 deepface
 opencv-python
 numpy
+pillow
+requests
+gunicorn
