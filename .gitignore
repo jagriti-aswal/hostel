@@ -53,3 +53,8 @@ __pycache__/
 
 .env
 backend/.env
+
+.env
+backend/.env
+node_modules/
+uploads/.env 

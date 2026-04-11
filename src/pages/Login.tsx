@@ -38,7 +38,8 @@ const Login: React.FC = () => {
     email: string,
     type: 'student' | 'admin'
   ) => {
-    const studentRegex = /^[0-9]+@nitkkr\.ac\.in$/;
+    //const studentRegex = /^[0-9]+@nitkkr\.ac\.in$/;
+    const studentRegex = /^\d{9}@nitkkr\.ac\.in$/;
     const adminRegex = /^[a-zA-Z]+@nitkkr\.ac\.in$/;
 
     if (type === 'student') return studentRegex.test(email);

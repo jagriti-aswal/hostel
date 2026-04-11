@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -81,11 +82,24 @@ const StudentDashboard: React.FC = () => {
     setCapturedImage(img);
     stopCamera();
   };
-
+  const getLocation = () => {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      (error) => reject(error)
+    );
+  });
+};
   const verifyFace = async () => {
     if (!capturedImage || !user) return;
 
     try {
+      const location = await getLocation();
       setIsVerifying(true);
 
       const res = await fetch(
@@ -96,9 +110,11 @@ const StudentDashboard: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: user.email,
-            image: capturedImage,
-          }),
+  email: user.email,
+  image: capturedImage,
+  latitude: location.latitude,
+  longitude: location.longitude
+})
         }
       );
 

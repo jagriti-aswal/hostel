@@ -11,13 +11,10 @@ import authRoutes from "./src/routes/authRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import faceAuthRoutes from "./src/routes/faceAuth.routes.js";
 import uploadRoutes from "./src/routes/uploadRoutes.js";
-
+import { startAttendanceReminder } from "./src/utils/attendanceScheduler.js";
+import "./src/cron/attendanceReminder.js";
 
 const app = express();
-app.use("/api", uploadRoutes);
-// ==========================
-// CORS
-// ==========================
 app.use(
   cors({
     origin: "http://localhost:8080",
@@ -25,6 +22,12 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api", uploadRoutes);
+app.use("/api/admin", adminRoutes);
+// ==========================
+// CORS
+// ==========================
+
 
 // ==========================
 // BODY PARSERS
@@ -63,6 +66,7 @@ app.get("/api/test", (req, res) => {
   res.json({ message: "Server working" });
 });
 
+startAttendanceReminder();
 // ==========================
 // SERVER START
 // ==========================
