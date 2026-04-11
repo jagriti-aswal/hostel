@@ -1,7 +1,7 @@
 flask
-deepface
-opencv-python
+gunicorn
 numpy
 pillow
 requests
-gunicorn
+opencv-python-headless
+deepface
