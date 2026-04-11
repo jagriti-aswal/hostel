@@ -1,46 +1,59 @@
 import axios from "axios";
 import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
-import * as geolib from "geolib";  // ✅ ADD THIS
+import * as geolib from "geolib";
+
+// 📍 Cauvery Bhawan boundary (rectangle)
+const hostelBoundary = [
+  { latitude: 29.94520, longitude: 76.81420 },
+  { latitude: 29.94520, longitude: 76.81510 },
+  { latitude: 29.94460, longitude: 76.81510 },
+  { latitude: 29.94460, longitude: 76.81420 }
+];
+
 export const markFaceAttendance = async (req, res) => {
   console.log("========== ATTENDANCE DEBUG ==========");
+
   try {
     const { email, image, latitude, longitude } = req.body;
 
-    console.log("Student Latitude:", latitude);
-    console.log("Student Longitude:", longitude);
+    console.log("Latitude:", latitude);
+    console.log("Longitude:", longitude);
 
-    // ==========================
-    // ❗ VALIDATION
-    // ==========================
     if (!email || !image) {
       return res.status(400).json({
         success: false,
         message: "Email and image required",
       });
     }
+
+    // 🌐 IP DEBUG
     const clientIP =
       req.headers["x-forwarded-for"] ||
       req.socket.remoteAddress ||
       "unknown";
 
     console.log("🌐 Client IP:", clientIP);
+
     // ==========================
-    // 📍 LOCATION CHECK
+    // 📍 LOCATION (RECTANGLE CHECK)
     // ==========================
-      if (latitude && longitude) {
-      const distance = geolib.getDistance(
+    if (latitude && longitude) {
+      const insideHostel = geolib.isPointInPolygon(
         { latitude: Number(latitude), longitude: Number(longitude) },
-        { latitude: COLLEGE_LAT, longitude: COLLEGE_LON }
+        hostelBoundary
       );
 
-      console.log("📍 Distance:", distance);
+      console.log("📍 Inside Cauvery Bhawan:", insideHostel);
 
-      if (distance <= MAX_DISTANCE) {
-        console.log("✅ Inside hostel");
-      } else {
-        console.log("❌ Outside hostel");
+      if (!insideHostel) {
+        return res.status(403).json({
+          success: false,
+          message: "You must be inside Cauvery Bhawan",
+        });
       }
+    } else {
+      console.log("⚠️ Location not provided");
     }
 
     // ==========================
@@ -66,7 +79,7 @@ export const markFaceAttendance = async (req, res) => {
     // 🧹 CLEAN BASE64
     // ==========================
     let cleanBase64 = image;
-    console.log("Live image length:", cleanBase64.length);
+
     if (typeof image === "string" && image.startsWith("data:image")) {
       cleanBase64 = image.split(",")[1];
     }
@@ -78,8 +91,8 @@ export const markFaceAttendance = async (req, res) => {
       });
     }
 
-    console.log("Stored Image:", user.photo);
-    console.log("Live Image Length:", cleanBase64.length);
+    console.log("📸 Stored Image:", user.photo);
+    console.log("📸 Live Image Length:", cleanBase64.length);
 
     // ==========================
     // 🤖 FACE VERIFY API
@@ -95,7 +108,7 @@ export const markFaceAttendance = async (req, res) => {
         }
       );
     } catch (err) {
-      console.error("ML API ERROR:", err.response?.data || err.message);
+      console.error("🔥 ML API ERROR:", err.response?.data || err.message);
 
       return res.status(500).json({
         success: false,
@@ -103,18 +116,16 @@ export const markFaceAttendance = async (req, res) => {
       });
     }
 
-    console.log("FACE VERIFY RESPONSE:", response.data);
-    if (response.data.success) {
-      console.log("✅ FACE MATCHED");
-    } else {
-      console.log("❌ FACE NOT MATCHED");
-    }
+    console.log("🤖 FACE RESPONSE:", response.data);
+
     if (!response.data.success) {
       return res.status(401).json({
         success: false,
         message: "Face not matched",
       });
     }
+
+    console.log("✅ FACE MATCHED");
 
     // ==========================
     // 📅 ATTENDANCE LOGIC
@@ -144,13 +155,11 @@ export const markFaceAttendance = async (req, res) => {
     });
 
   } catch (error) {
-  console.error("🔥 FULL ERROR:", error);
-  console.error("🔥 MESSAGE:", error.message);
-  console.error("🔥 STACK:", error.stack);
+    console.error("🔥 FULL ERROR:", error);
 
-  return res.status(500).json({
-    success: false,
-    message: error.message,   // 👈 IMPORTANT
-  });
-}
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
