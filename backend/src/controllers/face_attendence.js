@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
 import * as geolib from "geolib";  // ✅ ADD THIS
 export const markFaceAttendance = async (req, res) => {
+  console.log("========== ATTENDANCE DEBUG ==========");
   try {
     const { email, image, latitude, longitude } = req.body;
 
@@ -18,27 +19,27 @@ export const markFaceAttendance = async (req, res) => {
         message: "Email and image required",
       });
     }
+    const clientIP =
+      req.headers["x-forwarded-for"] ||
+      req.socket.remoteAddress ||
+      "unknown";
 
+    console.log("🌐 Client IP:", clientIP);
     // ==========================
     // 📍 LOCATION CHECK
     // ==========================
-    if (latitude && longitude) {
-      try {
-        const distance = geolib.getDistance(
-          { latitude: Number(latitude), longitude: Number(longitude) },
-          { latitude: COLLEGE_LAT, longitude: COLLEGE_LON }
-        );
+      if (latitude && longitude) {
+      const distance = geolib.getDistance(
+        { latitude: Number(latitude), longitude: Number(longitude) },
+        { latitude: COLLEGE_LAT, longitude: COLLEGE_LON }
+      );
 
-        console.log("Distance from hostel:", distance);
+      console.log("📍 Distance:", distance);
 
-        if (distance > MAX_DISTANCE) {
-          return res.status(403).json({
-            success: false,
-            message: "Outside hostel area",
-          });
-        }
-      } catch (err) {
-        console.error("Location error:", err.message);
+      if (distance <= MAX_DISTANCE) {
+        console.log("✅ Inside hostel");
+      } else {
+        console.log("❌ Outside hostel");
       }
     }
 
@@ -65,7 +66,7 @@ export const markFaceAttendance = async (req, res) => {
     // 🧹 CLEAN BASE64
     // ==========================
     let cleanBase64 = image;
-
+    console.log("Live image length:", cleanBase64.length);
     if (typeof image === "string" && image.startsWith("data:image")) {
       cleanBase64 = image.split(",")[1];
     }
@@ -103,7 +104,11 @@ export const markFaceAttendance = async (req, res) => {
     }
 
     console.log("FACE VERIFY RESPONSE:", response.data);
-
+    if (response.data.success) {
+      console.log("✅ FACE MATCHED");
+    } else {
+      console.log("❌ FACE NOT MATCHED");
+    }
     if (!response.data.success) {
       return res.status(401).json({
         success: false,

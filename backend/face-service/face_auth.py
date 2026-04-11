@@ -80,7 +80,7 @@ def verify_face_from_base64(stored_image_url, live_image_base64):
         )
 
         distance = float(result["distance"])
-        threshold = 0.40
+        threshold = 0.60
 
         return {
             "success": distance < threshold,
