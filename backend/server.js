@@ -17,7 +17,7 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Deploy safe
+// ✅ Deploy / proxy safe (VERY IMPORTANT for IP detection)
 app.set("trust proxy", true);
 
 // ==========================
@@ -25,7 +25,7 @@ app.set("trust proxy", true);
 // ==========================
 app.use(
   cors({
-    origin: true,
+    origin: true, // allow all (production friendly)
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -44,17 +44,17 @@ connectDB();
 console.log("🔥 SERVER FILE LOADED");
 
 // ==========================
-// ✅ LOGIN SHOULD BE PUBLIC (NO NETWORK LOCK)
+// 🔐 NETWORK LOCK (LOGIN ONLY)
 // ==========================
 
-// Debug (optional)
+// Debug log (optional but useful)
 app.use("/api/auth/login", (req, res, next) => {
-  console.log("✅ login route hit");
+  console.log("✅ login middleware reached");
   next();
 });
 
-// ❌ REMOVED networkLock from login
-// app.use("/api/auth/login", networkLock);
+// Actual network restriction
+app.use("/api/auth/login", networkLock);
 
 // ==========================
 // ROUTES
@@ -63,14 +63,11 @@ app.use("/api/auth/login", (req, res, next) => {
 // Upload routes
 app.use("/api", uploadRoutes);
 
-// Auth routes (LOGIN HERE ✅)
+// Auth routes
 app.use("/api/auth", authRoutes);
 
 // Admin routes
 app.use("/api/admin", adminRoutes);
-
-// ✅ Apply network lock ONLY to attendance
-app.use("/api/face-attendance", networkLock);
 
 // Face attendance routes
 app.use("/api", faceAuthRoutes);
