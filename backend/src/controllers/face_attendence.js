@@ -105,14 +105,18 @@ export const markFaceAttendance = async (req, res) => {
         {
           stored_image: user.photo,
           live_image: cleanBase64,
+        },
+        {
+          timeout: 60000, // ✅ ADD THIS (60 sec wait)
         }
       );
-    } catch (err) {
-      console.error("🔥 ML API ERROR:", err.response?.data || err.message);
+    }catch (err) {
+      console.error("🔥 ML FULL ERROR:", err);
+      console.error("🔥 ML RESPONSE:", err.response?.data);
 
       return res.status(500).json({
         success: false,
-        message: "Face verification service failed",
+        message: err.response?.data || err.message,
       });
     }
 
