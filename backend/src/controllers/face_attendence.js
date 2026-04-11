@@ -35,12 +35,12 @@ const insideHostel = geolib.isPointInPolygon(
 console.log("Student location:", latitude, longitude);
 console.log("Inside hostel:", insideHostel);
 
-if (!insideHostel) {
-  return res.status(403).json({
-    success: false,
-    message: "You must be inside Cauvery Bhawan to mark attendance"
-  });
-}
+// if (!insideHostel) {
+//   return res.status(403).json({
+//     success: false,
+//     message: "You must be inside Cauvery Bhawan to mark attendance"
+//   });
+// }
 
     // ===== LOCATION CHECK END =====
     // 1️⃣ Get user from DB
@@ -113,7 +113,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
  const response = await axios.post(
-      "http://127.0.0.1:5001/verify-face",
+      "https://jagriti-aswal-face-auth-api.hf.space/face/login",
       {
         stored_image: user.photo, // Supabase URL
         live_image: image,        // webcam base64
