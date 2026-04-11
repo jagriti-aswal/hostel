@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+
+console.log("LOGIN API HIT");
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
