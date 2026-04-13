@@ -23,7 +23,7 @@ export const startAttendanceReminder = () => {
     console.log("🚨 Absent:", absentStudents.length);
 
     for (const student of absentStudents) {
-      await sendReminderEmail(student.email, student.name);
+      await sendEmail(student.email, student.name);
     }
 
   });
