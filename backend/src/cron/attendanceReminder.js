@@ -1,7 +1,7 @@
-// import cron from "node-cron";
-// import User from "../models/User.js";
-// import Attendance from "../models/Attendance.js";
-// import { sendEmail } from "../utils/sendEmail.js";
+import cron from "node-cron";
+import User from "../models/User.js";
+import Attendance from "../models/Attendance.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 // // cron.schedule("* * * * *", async () => {
 // //   console.log("⏰ Running attendance reminder job...");
