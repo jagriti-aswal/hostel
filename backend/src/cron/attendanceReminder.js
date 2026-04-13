@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-cron.schedule("30 21 * * *", async () => {
+cron.schedule("55 9 * * *", async () => {
   console.log("⏰ Running attendance reminder job...");
 
   const today = new Date().toISOString().split("T")[0];
