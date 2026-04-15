@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
 import cors from "cors";
 import path from "path";
 
@@ -9,7 +10,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import faceAuthRoutes from "./src/routes/faceAuth.routes.js";
 import uploadRoutes from "./src/routes/uploadRoutes.js";
 import networkLock from "./networkLock.js";
-dotenv.config();
+
 //import { startAttendanceReminder } from "./src/utils/attendanceScheduler.js";
 //import "./cron/attendanceReminder.js"; // ✅ must import
 //import "./src/cron/attendanceReminder.js";
