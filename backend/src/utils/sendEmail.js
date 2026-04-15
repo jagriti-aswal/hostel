@@ -67,7 +67,8 @@ export const sendEmail = async (to, name) => {
     console.log("➡️ Sending email...");
 
     const info = await transporter.sendMail({
-      from: `"Smart Hostel" <${process.env.EMAIL_USER}>`,
+      //from: `"Smart Hostel" <${process.env.EMAIL_USER}>`,
+      from: `"Smart Hostel" <nishitaverma200616@gmail.com>`,
       to,
       subject: "⚠️ Attendance Reminder",
       html: `
