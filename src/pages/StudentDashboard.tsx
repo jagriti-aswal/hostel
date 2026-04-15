@@ -219,75 +219,136 @@ const checkLeaveStatus = async () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      
-      {/* HEADER */}
-      <header className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-sm">
-        <div>
-          <h1 className="font-semibold text-xl">Smart Hostel</h1>
+  <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-6">
 
-          <div className="mt-1 text-sm text-gray-600">
-            <p>Name: {user?.name}</p>
-            <p>Roll No: {user?.rollNo}</p>
-            <p>Email: {user?.email}</p>
-          </div>
+    {/* HEADER */}
+    <header className="flex justify-between items-center mb-8 p-5 bg-white/80 backdrop-blur rounded-2xl shadow-lg border">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">Smart Hostel</h1>
+        <p className="text-sm text-gray-500">AI-based Attendance System</p>
+
+        <div className="mt-2 text-sm text-gray-600 space-y-1">
+          <p><span className="font-medium">Name:</span> {user?.name}</p>
+          <p><span className="font-medium">Roll No:</span> {user?.rollNo}</p>
+          <p><span className="font-medium">Email:</span> {user?.email}</p>
         </div>
+      </div>
 
-        <Button variant="ghost" onClick={handleLogout}>
-          <LogOut className="w-4 h-4 mr-2" /> Logout
-        </Button>
-      </header>
+      <Button variant="destructive" onClick={handleLogout}>
+        <LogOut className="w-4 h-4 mr-2" />
+        Logout
+      </Button>
+    </header>
 
-      {/* PROFILE */}
-      <Card className="mb-6">
+    <div className="grid md:grid-cols-2 gap-6">
+
+      {/* PROFILE CARD */}
+      <Card className="rounded-2xl shadow-md hover:shadow-lg transition">
         <CardHeader>
           <CardTitle>Student Profile</CardTitle>
+          <CardDescription>Your basic details</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p>{user?.name}</p>
+
+        <CardContent className="text-gray-700 space-y-1">
+          <p className="font-medium text-lg">{user?.name}</p>
+          <p className="text-sm text-gray-500">{user?.email}</p>
         </CardContent>
       </Card>
 
-      {/* 🔥 LEAVE FORM */}
-      <Card className="mb-6">
+      {/* LEAVE CARD */}
+      <Card className="rounded-2xl shadow-md hover:shadow-lg transition">
         <CardHeader>
           <CardTitle>Apply Leave</CardTitle>
+          <CardDescription>Request leave for multiple days</CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-3">
-          <input type="date" value={leaveFrom} onChange={(e) => setLeaveFrom(e.target.value)} />
-          <input type="date" value={leaveTo} onChange={(e) => setLeaveTo(e.target.value)} />
-          <input type="text" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="date"
+              value={leaveFrom}
+              onChange={(e) => setLeaveFrom(e.target.value)}
+              className="border rounded-lg p-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+            />
+            <input
+              type="date"
+              value={leaveTo}
+              onChange={(e) => setLeaveTo(e.target.value)}
+              className="border rounded-lg p-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+            />
+          </div>
 
-          <Button onClick={applyLeave}>Apply Leave</Button>
-        </CardContent>
-      </Card>
+          <input
+            type="text"
+            placeholder="Reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+          />
 
-      {/* ATTENDANCE */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Mark Attendance</CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          {isOnLeave ? (
-            <div className="text-yellow-600">You are on leave</div>
-          ) : attendanceMarked ? (
-            <div className="text-green-600">Attendance marked</div>
-          ) : (
-            <>
-              <video ref={videoRef} autoPlay />
-              <canvas ref={canvasRef} className="hidden" />
-
-              <Button onClick={startCamera}>Open Camera</Button>
-              <Button onClick={capturePhoto}>Capture</Button>
-              <Button onClick={verifyFace}>Verify</Button>
-            </>
-          )}
+          <Button className="w-full" onClick={applyLeave}>
+            {isOnLeave ? "Already on Leave" : "Apply Leave"}
+          </Button>
         </CardContent>
       </Card>
     </div>
-  );
-};
 
-export default StudentDashboard;
+    {/* ATTENDANCE CARD */}
+    <Card className="mt-6 rounded-2xl shadow-lg border">
+      <CardHeader>
+        <CardTitle>Mark Attendance</CardTitle>
+        <CardDescription>Face verification + location check</CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+
+        {/* STATUS */}
+        {isOnLeave && (
+          <div className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg text-sm">
+            ⚠️ You are currently on leave
+          </div>
+        )}
+
+        {attendanceMarked && (
+          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm">
+            ✅ Attendance marked successfully
+          </div>
+        )}
+
+        {/* CAMERA */}
+        {!isOnLeave && !attendanceMarked && (
+          <>
+            <div className="rounded-xl overflow-hidden border bg-black flex justify-center items-center">
+              <video
+                ref={videoRef}
+                autoPlay
+                className="w-full h-72 object-cover"
+              />
+            </div>
+
+            <canvas ref={canvasRef} className="hidden" />
+
+            {/* BUTTONS */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={startCamera}>
+                Open Camera
+              </Button>
+
+              <Button onClick={capturePhoto}>
+                Capture
+              </Button>
+
+              <Button
+                onClick={verifyFace}
+                disabled={isVerifying}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isVerifying ? "Verifying..." : "Verify & Mark"}
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
