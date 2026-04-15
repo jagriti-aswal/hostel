@@ -10,6 +10,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import faceAuthRoutes from "./src/routes/faceAuth.routes.js";
 import uploadRoutes from "./src/routes/uploadRoutes.js";
 import networkLock from "./networkLock.js";
+import leaveRoutes from "./routes/leave.js";
 
 //import { startAttendanceReminder } from "./src/utils/attendanceScheduler.js";
 //import "./cron/attendanceReminder.js"; // ✅ must import
