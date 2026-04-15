@@ -9,6 +9,7 @@ import { adminOnly } from "../middleware/adminOnly.js";
 import supabase from "../config/supabase.js";
 import fs from "fs";
 import Attendance from "../models/Attendance.js";
+import Leave from "../models/Leave.js";
 const router = express.Router();
 
 
@@ -63,19 +64,49 @@ router.post(
 );
 /* ================= GET ALL STUDENTS ================= */
 
+// router.get("/students", protect, adminOnly, async (req, res) => {
+//   try {
+//     const students = await User.find({ role: "student" }).select(
+//       "_id name rollNumber roomNumber photo"
+//     );
+
+//     res.json(students);
+//   } catch (error) {
+//     console.error("GET STUDENTS ERROR 👉", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
 router.get("/students", protect, adminOnly, async (req, res) => {
   try {
     const students = await User.find({ role: "student" }).select(
-      "_id name rollNumber roomNumber photo"
+      "_id name rollNumber roomNumber photo email"
     );
 
-    res.json(students);
+    const today = new Date();
+
+    const updatedStudents = await Promise.all(
+      students.map(async (student) => {
+
+        const leave = await Leave.findOne({
+          email: student.email,
+          from: { $lte: today },
+          to: { $gte: today },
+        });
+
+        return {
+          ...student._doc,
+          isOnLeave: !!leave, // 🔥 THIS IS WHAT FRONTEND NEEDS
+        };
+      })
+    );
+
+    res.json(updatedStudents);
+
   } catch (error) {
     console.error("GET STUDENTS ERROR 👉", error);
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 router.get("/attendance", protect, adminOnly, async (req, res) => {
   try {

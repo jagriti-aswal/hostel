@@ -2,7 +2,7 @@ import axios from "axios";
 import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
 import * as geolib from "geolib";
-
+import Leave from "../models/Leave.js";
 // 📍 Cauvery Bhawan boundary (rectangle)
 const hostelBoundary = [
   { latitude: 29.94520, longitude: 76.81420 },
@@ -67,7 +67,25 @@ export const markFaceAttendance = async (req, res) => {
         message: "User not found",
       });
     }
+    // ==========================
+// 🟡 LEAVE CHECK
+// ==========================
+const todayDate = new Date();
 
+const leave = await Leave.findOne({
+  email: user.email,
+  from: { $lte: todayDate },
+  to: { $gte: todayDate },
+});
+
+if (leave) {
+  console.log("🟡 Student is on leave");
+
+  return res.json({
+    success: false,
+    message: "You are on leave",
+  });
+}
     if (!user.photo || !user.photo.startsWith("http")) {
       return res.status(400).json({
         success: false,
