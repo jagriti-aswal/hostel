@@ -60,17 +60,7 @@ export const markFaceAttendance = async (req, res) => {
     // 👤 GET USER
     // ==========================
     const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    // ==========================
-// 🟡 LEAVE CHECK
-// ==========================
-const todayDate = new Date();
+      const todayDate = new Date();
 
 const leave = await Leave.findOne({
   email: user.email,
@@ -79,13 +69,18 @@ const leave = await Leave.findOne({
 });
 
 if (leave) {
-  console.log("🟡 Student is on leave");
-
   return res.json({
     success: false,
     message: "You are on leave",
   });
 }
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
     if (!user.photo || !user.photo.startsWith("http")) {
       return res.status(400).json({
         success: false,

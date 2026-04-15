@@ -22,7 +22,7 @@ const app = express();
 
 // ✅ Deploy safe
 app.set("trust proxy", true);
-app.use("/api/leave", require("./routes/leave"));
+app.use("/api/leave", leaveRoutes);
 // ==========================
 // CORS
 // ==========================

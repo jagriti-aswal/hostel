@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const leaveSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  from: { type: Date, required: true },
-  to: { type: Date, required: true },
+  email: String,
+  from: Date,
+  to: Date,
   reason: String,
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model("Leave", leaveSchema);
+export default mongoose.model("Leave", leaveSchema);

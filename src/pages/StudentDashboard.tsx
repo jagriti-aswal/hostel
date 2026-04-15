@@ -285,12 +285,19 @@ const StudentDashboard: React.FC = () => {
   const [reason, setReason] = useState("");
   const [isOnLeave, setIsOnLeave] = useState(false);
 
-  useEffect(() => {
-    if (userType !== "student") {
-      navigate("/");
-    }
-  }, [userType, navigate]);
+  // useEffect(() => {
+  //   if (userType !== "student") {
+  //     navigate("/");
+  //   }
+  // }, [userType, navigate]);
+useEffect(() => {
+  if (userType !== "student") {
+    navigate("/");
+  }
 
+  checkLeaveStatus(); // 🔥 ADD THIS
+
+}, [userType, navigate]);
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -307,7 +314,21 @@ const StudentDashboard: React.FC = () => {
       });
     }
   };
+const checkLeaveStatus = async () => {
+  try {
+    const res = await fetch(
+      `https://hostel-tprs.onrender.com/api/leave/check?email=${user?.email}`
+    );
 
+    const data = await res.json();
+
+    if (data.isOnLeave) {
+      setIsOnLeave(true);
+    }
+  } catch (err) {
+    console.error("Leave check failed");
+  }
+};
   const stopCamera = () => {
     const stream = videoRef.current?.srcObject as MediaStream | null;
     stream?.getTracks().forEach((track) => track.stop());
