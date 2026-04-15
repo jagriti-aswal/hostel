@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (token && storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
+        const parsedUser: User = JSON.parse(storedUser);
         setUser(parsedUser);
         setUserType(parsedUser.role);
       } catch (err) {
@@ -63,16 +63,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         "https://hostel-tprs.onrender.com/api/auth/login",
         { email, password }
       );
+
       console.log("LOGIN RESPONSE:", res.data);
-      // 🔥 SAFE FIX: handle BOTH backend formats
-      const user: User = res.data.user || {
-        email: res.data.email,
-        role: res.data.role,
-        name: res.data.name,
-        rollNo: res.data.rollNo,
+
+      // ✅ STRONG NORMALIZATION (FIX)
+      const raw = res.data.user || res.data;
+
+      const user: User = {
+        email: raw.email,
+        role: raw.role,
+        name: raw.name || "",
+        rollNo: raw.rollNo || "",
       };
 
-      if (!user || user.role !== type) {
+      if (!user.role || user.role !== type) {
         return false;
       }
 
