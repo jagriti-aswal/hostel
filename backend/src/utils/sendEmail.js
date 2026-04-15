@@ -52,20 +52,20 @@
 
 import nodemailer from "nodemailer";
 
-// ✅ transporter (production safe)
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // ⚠️ App Password
+    pass: process.env.EMAIL_PASS, // ✅ App Password
   },
   connectionTimeout: 10000,
   greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
-// ✅ verify SMTP (debug ke liye)
+// ✅ VERY IMPORTANT (debug)
 transporter.verify((error, success) => {
   if (error) {
     console.log("❌ SMTP Error:", error);
@@ -76,22 +76,17 @@ transporter.verify((error, success) => {
 
 export const sendEmail = async (to, name) => {
   try {
-    console.log("➡️ Trying to send email to:", to);
+    console.log("➡️ Trying to send email...");
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Smart Hostel" <${process.env.EMAIL_USER}>`,
       to,
       subject: "⚠️ Attendance Reminder",
-      html: `
-        <h2>Hello ${name}</h2>
-        <p>You have not marked your attendance today.</p>
-        <p>Please mark it before deadline.</p>
-        <br/>
-        <p>— Smart Hostel System</p>
-      `,
+      html: `<h2>Hello ${name}</h2>
+             <p>You have not marked your attendance today.</p>`,
     });
 
-    console.log(`📧 Email sent to ${to}`);
+    console.log("📧 Email sent:", info.response);
   } catch (err) {
     console.error("❌ Email error:", err);
   }
