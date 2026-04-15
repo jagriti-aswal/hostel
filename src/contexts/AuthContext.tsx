@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         "https://hostel-tprs.onrender.com/api/auth/login",
         { email, password }
       );
-
+      console.log("LOGIN RESPONSE:", res.data);
       // 🔥 SAFE FIX: handle BOTH backend formats
       const user: User = res.data.user || {
         email: res.data.email,
