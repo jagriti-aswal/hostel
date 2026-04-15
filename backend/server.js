@@ -11,7 +11,8 @@ import uploadRoutes from "./src/routes/uploadRoutes.js";
 import networkLock from "./networkLock.js";
 
 //import { startAttendanceReminder } from "./src/utils/attendanceScheduler.js";
-import "./cron/attendanceReminder.js"; // ✅ must import
+//import "./cron/attendanceReminder.js"; // ✅ must import
+//import "./src/cron/attendanceReminder.js";
 import "./src/cron/attendanceReminder.js";
 
 dotenv.config();
