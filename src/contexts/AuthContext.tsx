@@ -233,73 +233,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 }, []);
 
-  // const login = async (
-  //   email: string,
-  //   password: string,
-  //   type: "student" | "admin"
-  // ): Promise<boolean> => {
-  //   try {
-  //     const res = await axios.post("https://hostel-tprs.onrender.com/api/auth/login", {
-  //       email,
-  //       password,
-  //     });
-
-  //     // ❗ role check
-  //     if (res.data.role !== type) {
-  //       return false;
-  //     }
-
-  //     localStorage.setItem("token", res.data.token);
-  //     localStorage.setItem(
-  //       "user",
-  //       JSON.stringify({ email: res.data.email, role: res.data.role })
-  //     );
-
-  //     setUser({ email: res.data.email, role: res.data.role });
-  //     setUserType(res.data.role);
-
-  //     return true;
-  //   } catch (err) {
-  //     console.error("LOGIN ERROR", err);
-  //     return false;
-  //   }
-  // };
   const login = async (
-  email: string,
-  password: string,
-  type: "student" | "admin"
-): Promise<boolean> => {
-  try {
-    const res = await axios.post(
-      "https://hostel-tprs.onrender.com/api/auth/login",
-      {
+    email: string,
+    password: string,
+    type: "student" | "admin"
+  ): Promise<boolean> => {
+    try {
+      const res = await axios.post("https://hostel-tprs.onrender.com/api/auth/login", {
         email,
         password,
+      });
+
+      // ❗ role check
+      if (res.data.role !== type) {
+        return false;
       }
-    );
 
-    const user = res.data.user; // ✅ IMPORTANT
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: res.data.email, role: res.data.role })
+      );
 
-    // ❗ role check
-    if (user.role !== type) {
+      setUser({ email: res.data.email, role: res.data.role });
+      setUserType(res.data.role);
+
+      return true;
+    } catch (err) {
+      console.error("LOGIN ERROR", err);
       return false;
     }
+  };
 
-    localStorage.setItem("token", res.data.token);
-
-    // ✅ store FULL user object (name, rollNo, email, role)
-    localStorage.setItem("user", JSON.stringify(user));
-
-    // ✅ set full user in state
-    setUser(user);
-    setUserType(user.role);
-
-    return true;
-  } catch (err) {
-    console.error("LOGIN ERROR", err);
-    return false;
-  }
-};
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
