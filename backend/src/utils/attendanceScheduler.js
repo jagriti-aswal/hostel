@@ -3,7 +3,7 @@ import Attendance from "../models/Attendance.js";
 import User from "../models/User.js";
 import { sendEmail } from "./sendEmail.js";
 
-// export const startAttendanceReminder = () => {
+export const startAttendanceReminder = () => {
 
 //   // ⏰ 9:30 PM daily
 //   cron.schedule("25 21 * * *", async () => {
@@ -31,7 +31,7 @@ import { sendEmail } from "./sendEmail.js";
 // };
 
 
-cron.schedule("26 22 * * *", async () => {
+cron.schedule("28 22 * * *", async () => {
   console.log("⏰ Running attendance reminder...");
   
   const today = new Date().toISOString().split("T")[0];
@@ -54,3 +54,4 @@ cron.schedule("26 22 * * *", async () => {
 }, {
   timezone: "Asia/Kolkata"
 });
+}
