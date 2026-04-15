@@ -64,6 +64,8 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async (to, name) => {
   try {
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
     console.log("➡️ Sending email...");
 
     const info = await transporter.sendMail({
