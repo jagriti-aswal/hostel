@@ -53,40 +53,30 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // ✅ App Password
+    pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-
-// ✅ VERY IMPORTANT (debug)
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP Error:", error);
-  } else {
-    console.log("✅ SMTP Ready");
-  }
 });
 
 export const sendEmail = async (to, name) => {
   try {
-    console.log("➡️ Trying to send email...");
+    console.log("➡️ Sending email...");
 
     const info = await transporter.sendMail({
       from: `"Smart Hostel" <${process.env.EMAIL_USER}>`,
       to,
       subject: "⚠️ Attendance Reminder",
-      html: `<h2>Hello ${name}</h2>
-             <p>You have not marked your attendance today.</p>`,
+      html: `
+        <h2>Hello ${name}</h2>
+        <p>You have not marked your attendance today.</p>
+      `,
     });
 
-    console.log("📧 Email sent:", info.response);
+    console.log("✅ Email sent:", info.response);
   } catch (err) {
     console.error("❌ Email error:", err);
   }
