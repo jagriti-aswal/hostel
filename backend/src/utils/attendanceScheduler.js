@@ -6,7 +6,7 @@
 // export const startAttendanceReminder = () => {
 
 //   // ⏰ 9:30 PM daily
-//   cron.schedule("* * * * *", async () => {
+//   cron.schedule("25 21 * * *", async () => {
 //     console.log("⏰ Running attendance reminder...");
 
 //     const today = new Date().toISOString().split("T")[0];
@@ -23,7 +23,7 @@
 //     console.log("🚨 Absent:", absentStudents.length);
 
 //     for (const student of absentStudents) {
-//       await sendEmail(student.email, student.name);
+//       await sendReminderEmail(student.email, student.name);
 //     }
 
 //   });
@@ -31,34 +31,26 @@
 // };
 
 
-import cron from "node-cron";
-import Attendance from "../models/Attendance.js";
-import User from "../models/User.js";
-import { sendEmail } from "./sendEmail.js";
+cron.schedule("06 22 * * *", async () => {
+  console.log("⏰ Running attendance reminder...");
+  
+  const today = new Date().toISOString().split("T")[0];
 
-export const startAttendanceReminder = () => {
+  const allStudents = await User.find({ role: "student" });
+  const present = await Attendance.find({ date: today });
 
-  // ⏰ 9:30 PM daily
-  cron.schedule("25 21 * * *", async () => {
-    console.log("⏰ Running attendance reminder...");
+  const presentIds = present.map(a => a.student.toString());
 
-    const today = new Date().toISOString().split("T")[0];
+  const absentStudents = allStudents.filter(
+    s => !presentIds.includes(s._id.toString())
+  );
 
-    const allStudents = await User.find({ role: "student" });
-    const present = await Attendance.find({ date: today });
+  console.log("🚨 Absent:", absentStudents.length);
 
-    const presentIds = present.map(a => a.student.toString());
+  for (const student of absentStudents) {
+    await sendReminderEmail(student.email, student.name);
+  }
 
-    const absentStudents = allStudents.filter(
-      s => !presentIds.includes(s._id.toString())
-    );
-
-    console.log("🚨 Absent:", absentStudents.length);
-
-    for (const student of absentStudents) {
-      await sendReminderEmail(student.email, student.name);
-    }
-
-  });
-
-};
+}, {
+  timezone: "Asia/Kolkata"
+});
