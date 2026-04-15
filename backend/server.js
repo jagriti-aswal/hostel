@@ -9,13 +9,13 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import faceAuthRoutes from "./src/routes/faceAuth.routes.js";
 import uploadRoutes from "./src/routes/uploadRoutes.js";
 import networkLock from "./networkLock.js";
-
+dotenv.config();
 //import { startAttendanceReminder } from "./src/utils/attendanceScheduler.js";
 //import "./cron/attendanceReminder.js"; // ✅ must import
 //import "./src/cron/attendanceReminder.js";
 import "./src/cron/attendanceReminder.js";
 
-dotenv.config();
+
 
 const app = express();
 
