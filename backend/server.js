@@ -92,7 +92,7 @@ app.get("/api/test", (req, res) => {
 // ==========================
 // CRON / SCHEDULER
 // ==========================
-startAttendanceReminder();
+//startAttendanceReminder();
 
 // ==========================
 // SERVER START
