@@ -1,141 +1,290 @@
-return (
-  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-    {/* HEADER */}
-    <div className="flex justify-between items-center mb-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Welcome, {user?.name}
-        </h1>
-        <p className="text-sm text-gray-500">
-          Mark your attendance and manage leave
-        </p>
-      </div>
+import React, { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { LogOut } from "lucide-react";
 
-      <Button variant="destructive" onClick={handleLogout}>
-        <LogOut className="w-4 h-4 mr-2" />
-        Logout
-      </Button>
-    </div>
+const StudentDashboard: React.FC = () => {
+  const { user, logout, userType } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-    <div className="grid md:grid-cols-2 gap-6">
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [attendanceMarked, setAttendanceMarked] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // 🔥 NEW STATES
+  const [leaveFrom, setLeaveFrom] = useState("");
+  const [leaveTo, setLeaveTo] = useState("");
+  const [reason, setReason] = useState("");
+  const [isOnLeave, setIsOnLeave] = useState(false);
+
+  // useEffect(() => {
+  //   if (userType !== "student") {
+  //     navigate("/");
+  //   }
+  // }, [userType, navigate]);
+useEffect(() => {
+  if (userType !== "student") {
+    navigate("/");
+  }
+
+  checkLeaveStatus(); // 🔥 ADD THIS
+
+}, [userType, navigate]);
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        setIsCameraOpen(true);
+      }
+    } catch {
+      toast({
+        title: "Camera blocked",
+        variant: "destructive",
+      });
+    }
+  };
+const checkLeaveStatus = async () => {
+  try {
+    const res = await fetch(
+      `https://hostel-tprs.onrender.com/api/leave/check?email=${user?.email}`
+    );
+
+    const data = await res.json();
+
+    if (data.isOnLeave) {
+      setIsOnLeave(true);
+    }
+  } catch (err) {
+    console.error("Leave check failed");
+  }
+};
+  const stopCamera = () => {
+    const stream = videoRef.current?.srcObject as MediaStream | null;
+    stream?.getTracks().forEach((track) => track.stop());
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    setIsCameraOpen(false);
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (!video || !canvas) return;
+
+    if (video.videoWidth === 0) {
+      toast({ title: "Camera not ready" });
+      return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx?.drawImage(video, 0, 0);
+
+    const img = canvas.toDataURL("image/jpeg", 0.9);
+
+    setCapturedImage(img);
+    stopCamera();
+  };
+
+  const getLocation = () => {
+    return new Promise<{ latitude: number; longitude: number }>(
+      (resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          (error) => reject(error)
+        );
+      }
+    );
+  };
+
+  const verifyFace = async () => {
+    if (!capturedImage || !user) return;
+
+    try {
+      const location = await getLocation();
+      setIsVerifying(true);
+
+      const res = await fetch(
+        "https://hostel-tprs.onrender.com/api/face-attendance",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: user.email,
+            image: capturedImage,
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error();
+      }
+
+      setAttendanceMarked(true);
+
+      toast({
+        title: "Attendance marked successfully ✓",
+      });
+    } catch {
+      toast({
+        title: "Face not recognized",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // 🔥 APPLY LEAVE
+  const applyLeave = async () => {
+    if (!leaveFrom || !leaveTo) {
+      toast({ title: "Please select leave dates", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        "https://hostel-tprs.onrender.com/api/leave",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: user?.email,
+            from: leaveFrom,
+            to: leaveTo,
+            reason,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error();
+
+      setIsOnLeave(true);
+
+      toast({
+        title: "Leave applied successfully ✓",
+      });
+    } catch {
+      toast({
+        title: "Failed to apply leave",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="min-h-screen p-6 bg-gray-50">
       
-      {/* ATTENDANCE CARD */}
-      <Card className="shadow-lg border-0">
+      {/* HEADER */}
+      <header className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-sm">
+        <div>
+          <h1 className="font-semibold text-xl">Smart Hostel</h1>
+
+          <div className="mt-1 text-sm text-gray-600">
+            <p>Name: {user?.name}</p>
+            <p>Roll No: {user?.rollNo}</p>
+            <p>Email: {user?.email}</p>
+          </div>
+        </div>
+
+        <Button variant="ghost" onClick={handleLogout}>
+          <LogOut className="w-4 h-4 mr-2" /> Logout
+        </Button>
+      </header>
+
+      {/* PROFILE */}
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
-            Face Attendance
-          </CardTitle>
-          <CardDescription>
-            Capture your photo to mark attendance
-          </CardDescription>
+          <CardTitle>Student Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{user?.name}</p>
+        </CardContent>
+      </Card>
+
+      {/* 🔥 LEAVE FORM */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Apply Leave</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
+          <input type="date" value={leaveFrom} onChange={(e) => setLeaveFrom(e.target.value)} />
+          <input type="date" value={leaveTo} onChange={(e) => setLeaveTo(e.target.value)} />
+          <input type="text" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
 
-          {/* STATUS */}
-          {isOnLeave && (
-            <div className="p-3 bg-yellow-100 text-yellow-700 rounded-lg text-sm">
-              You are currently on leave
-            </div>
-          )}
+          <Button onClick={applyLeave}>Apply Leave</Button>
+        </CardContent>
+      </Card>
 
-          {attendanceMarked && (
-            <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Attendance marked successfully
-            </div>
-          )}
+      {/* ATTENDANCE */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mark Attendance</CardTitle>
+        </CardHeader>
 
-          {/* CAMERA */}
-          {!isOnLeave && !attendanceMarked && (
+        <CardContent>
+          {isOnLeave ? (
+            <div className="text-yellow-600">You are on leave</div>
+          ) : attendanceMarked ? (
+            <div className="text-green-600">Attendance marked</div>
+          ) : (
             <>
-              <div className="rounded-lg overflow-hidden border bg-black">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-
+              <video ref={videoRef} autoPlay />
               <canvas ref={canvasRef} className="hidden" />
 
-              {/* BUTTONS */}
-              <div className="flex gap-2 flex-wrap">
-                {!isCameraOpen && (
-                  <Button onClick={startCamera}>
-                    <Camera className="w-4 h-4 mr-2" />
-                    Open Camera
-                  </Button>
-                )}
-
-                {isCameraOpen && (
-                  <Button onClick={capturePhoto}>
-                    Capture
-                  </Button>
-                )}
-
-                {capturedImage && (
-                  <Button
-                    onClick={verifyFace}
-                    disabled={isVerifying}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {isVerifying ? "Verifying..." : "Verify & Mark"}
-                  </Button>
-                )}
-              </div>
+              <Button onClick={startCamera}>Open Camera</Button>
+              <Button onClick={capturePhoto}>Capture</Button>
+              <Button onClick={verifyFace}>Verify</Button>
             </>
           )}
         </CardContent>
       </Card>
-
-      {/* LEAVE CARD */}
-      <Card className="shadow-lg border-0">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Apply Leave
-          </CardTitle>
-          <CardDescription>
-            Submit leave request for multiple days
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="date"
-              value={leaveFrom}
-              onChange={(e) => setLeaveFrom(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-            <input
-              type="date"
-              value={leaveTo}
-              onChange={(e) => setLeaveTo(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-          </div>
-
-          <textarea
-            placeholder="Reason for leave..."
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="w-full border rounded-lg p-2"
-          />
-
-          <Button
-            onClick={applyLeave}
-            disabled={isOnLeave}
-            className="w-full"
-          >
-            {isOnLeave ? "Already on Leave" : "Apply Leave"}
-          </Button>
-
-        </CardContent>
-      </Card>
     </div>
-  </div>
-);
+  );
+};
+
+export default StudentDashboard;
