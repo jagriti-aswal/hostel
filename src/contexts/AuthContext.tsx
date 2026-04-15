@@ -61,24 +61,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await axios.post(
         "https://hostel-tprs.onrender.com/api/auth/login",
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
-      // =========================
-      // SAFE USER EXTRACTION
-      // =========================
-      const user = res.data.user || {
+      // 🔥 SAFE FIX: handle BOTH backend formats
+      const user: User = res.data.user || {
         email: res.data.email,
         role: res.data.role,
         name: res.data.name,
         rollNo: res.data.rollNo,
       };
 
-      // role check
-      if (user.role !== type) {
+      if (!user || user.role !== type) {
         return false;
       }
 
@@ -120,9 +114,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// =========================
-// HOOK
-// =========================
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
