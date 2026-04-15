@@ -1,7 +1,7 @@
-// import cron from "node-cron";
-// import Attendance from "../models/Attendance.js";
-// import User from "../models/User.js";
-// import { sendEmail } from "./sendEmail.js";
+import cron from "node-cron";
+import Attendance from "../models/Attendance.js";
+import User from "../models/User.js";
+import { sendEmail } from "./sendEmail.js";
 
 // export const startAttendanceReminder = () => {
 
@@ -31,7 +31,7 @@
 // };
 
 
-cron.schedule("9 22 * * *", async () => {
+cron.schedule("26 22 * * *", async () => {
   console.log("⏰ Running attendance reminder...");
   
   const today = new Date().toISOString().split("T")[0];
