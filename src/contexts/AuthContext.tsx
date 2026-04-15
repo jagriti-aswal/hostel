@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (token && storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
+        const parsedUser: User = JSON.parse(storedUser);
         setUser(parsedUser);
         setUserType(parsedUser.role);
       } catch (err) {
@@ -61,24 +61,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await axios.post(
         "https://hostel-tprs.onrender.com/api/auth/login",
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
-      // =========================
-      // SAFE USER EXTRACTION
-      // =========================
-      const user = res.data.user || {
-        email: res.data.email,
-        role: res.data.role,
-        name: res.data.name,
-        rollNo: res.data.rollNo,
+      console.log("LOGIN RESPONSE:", res.data);
+
+      // ✅ STRONG NORMALIZATION (FIX)
+      const raw = res.data.user || res.data;
+
+      const user: User = {
+        email: raw.email,
+        role: raw.role,
+        name: raw.name || "",
+        rollNo: raw.rollNo || "",
       };
 
-      // role check
-      if (user.role !== type) {
+      if (!user.role || user.role !== type) {
         return false;
       }
 
@@ -120,9 +118,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// =========================
-// HOOK
-// =========================
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
