@@ -219,59 +219,71 @@ const checkLeaveStatus = async () => {
   };
 
   if (!user) return null;
-
-  return (
-  <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-white to-blue-100 p-6">
+return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-blue-100 p-6">
 
     {/* TOP BAR */}
     <div className="flex justify-between items-center mb-8">
-      <h1 className="text-3xl font-bold text-gray-800">
+      <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
         Student Dashboard
       </h1>
 
       <Button
         variant="destructive"
         onClick={handleLogout}
-        className="rounded-xl px-5 py-2 shadow-md"
+        className="rounded-xl px-5 shadow-md"
       >
         Logout
       </Button>
     </div>
 
-    {/* TWO PARTITIONS */}
+    {/* MAIN GRID */}
     <div className="grid lg:grid-cols-2 gap-8">
 
-      {/* ATTENDANCE SECTION */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-lg p-7 border border-white/40">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-          📸 Attendance
-        </h2>
+      {/* ================= ATTENDANCE CARD ================= */}
+      <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
 
-        {/* STATUS */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">📸 Attendance</h2>
+
+          {isOnLeave && (
+            <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border">
+              On Leave
+            </span>
+          )}
+
+          {attendanceMarked && (
+            <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 border">
+              Marked
+            </span>
+          )}
+        </div>
+
+        {/* STATUS INFO */}
         {isOnLeave && (
-          <div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded-xl mb-4 border">
-            ⚠️ You are on leave
+          <div className="mb-4 text-sm bg-yellow-50 text-yellow-800 p-3 rounded-xl border">
+            ⚠️ You are currently on leave
           </div>
         )}
 
         {attendanceMarked && (
-          <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 border">
-            ✅ Attendance marked
+          <div className="mb-4 text-sm bg-green-50 text-green-700 p-3 rounded-xl border">
+            ✅ Attendance successfully marked
           </div>
         )}
 
+        {/* CAMERA BLOCK */}
         {!isOnLeave && !attendanceMarked && (
           <>
-            {/* CAMERA */}
-            <div className="relative rounded-2xl overflow-hidden border bg-black mb-5">
+            <div className="relative rounded-2xl overflow-hidden border bg-black mb-4 shadow-md">
               <video
                 ref={videoRef}
                 autoPlay
-                className="w-full h-80 object-cover"
+                className="w-full h-72 object-cover"
               />
 
               {!isCameraOpen && (
-                <div className="absolute inset-0 flex items-center justify-center text-white bg-black/60">
+                <div className="absolute inset-0 flex items-center justify-center text-white bg-black/70">
                   Camera is off
                 </div>
               )}
@@ -281,13 +293,13 @@ const checkLeaveStatus = async () => {
             {capturedImage && (
               <img
                 src={capturedImage}
-                className="rounded-xl border w-full h-48 object-cover mb-4"
+                className="rounded-xl border w-full h-44 object-cover mb-4 shadow-sm"
               />
             )}
 
             {/* BUTTONS */}
-            <div className="flex gap-3 flex-wrap">
-              <Button onClick={startCamera} className="bg-indigo-600">
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={startCamera} className="bg-indigo-600 rounded-xl">
                 Open Camera
               </Button>
 
@@ -295,6 +307,7 @@ const checkLeaveStatus = async () => {
                 onClick={capturePhoto}
                 disabled={!isCameraOpen}
                 variant="secondary"
+                className="rounded-xl"
               >
                 Capture
               </Button>
@@ -302,22 +315,23 @@ const checkLeaveStatus = async () => {
               <Button
                 onClick={verifyFace}
                 disabled={!capturedImage || isVerifying}
-                className="bg-green-600"
+                className="bg-green-600 rounded-xl"
               >
-                {isVerifying ? "Verifying..." : "Verify"}
+                {isVerifying ? "Verifying..." : "Verify Attendance"}
               </Button>
             </div>
           </>
         )}
       </div>
 
-      {/* LEAVE SECTION */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-lg p-7 border border-white/40">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-          📅 Leave
-        </h2>
+      {/* ================= LEAVE CARD ================= */}
+      <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+
+        <h2 className="text-xl font-semibold mb-6">📅 Leave Application</h2>
 
         <div className="space-y-5">
+
+          {/* DATE PICKERS */}
           <div className="grid grid-cols-2 gap-4">
             <input
               type="date"
@@ -325,6 +339,7 @@ const checkLeaveStatus = async () => {
               onChange={(e) => setLeaveFrom(e.target.value)}
               className="border rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-400"
             />
+
             <input
               type="date"
               value={leaveTo}
@@ -333,23 +348,32 @@ const checkLeaveStatus = async () => {
             />
           </div>
 
+          {/* REASON */}
           <textarea
-            placeholder="Reason for leave..."
+            placeholder="Write reason for leave..."
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             className="w-full border rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-400 h-28"
           />
 
+          {/* BUTTON */}
           <Button
             onClick={applyLeave}
             disabled={isOnLeave}
-            className="w-full bg-indigo-600"
+            className="w-full bg-indigo-600 rounded-xl"
           >
-            {isOnLeave ? "Already on Leave" : "Apply Leave"}
+            {isOnLeave ? "Leave Already Applied" : "Apply for Leave"}
           </Button>
+
+          {/* INFO BOX */}
+          {isOnLeave && (
+            <div className="text-sm text-center bg-indigo-50 text-indigo-700 p-3 rounded-xl border">
+              Your leave request is active
+            </div>
+          )}
+
         </div>
       </div>
-
     </div>
   </div>
 );
