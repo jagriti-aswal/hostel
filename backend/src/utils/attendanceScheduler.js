@@ -39,7 +39,7 @@ import { sendEmail } from "./sendEmail.js";
 export const startAttendanceReminder = () => {
 
   // ⏰ 9:30 PM daily
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("25 21 * * *", async () => {
     console.log("⏰ Running attendance reminder...");
 
     const today = new Date().toISOString().split("T")[0];
