@@ -151,7 +151,7 @@ const checkLeaveStatus = async () => {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error();
+        throw new Error(data.message || "Verification failed");
       }
 
       setAttendanceMarked(true);
@@ -159,12 +159,15 @@ const checkLeaveStatus = async () => {
       toast({
         title: "Attendance marked successfully ✓",
       });
-    } catch {
-      toast({
-        title: "Face not recognized",
-        variant: "destructive",
-      });
-    } finally {
+    } catch (err: any) {
+  console.error(err);
+
+  toast({
+    title: "Verification Failed",
+    description: err.message,
+    variant: "destructive",
+  });
+} finally {
       setIsVerifying(false);
     }
   };

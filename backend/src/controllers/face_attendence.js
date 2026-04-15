@@ -34,6 +34,14 @@ export const markFaceAttendance = async (req, res) => {
       "unknown";
 
     console.log("🌐 Client IP:", clientIP);
+    // Example hostel WiFi IP pattern (adjust if needed)
+if (!clientIP.includes("10.") && !clientIP.includes("192.168")) {
+  return res.status(403).json({
+    success: false,
+    errorType: "WIFI",
+    message: "You are not connected to hostel WiFi",
+  });
+}
 
     // ==========================
     // 📍 LOCATION (RECTANGLE CHECK)
@@ -49,6 +57,7 @@ export const markFaceAttendance = async (req, res) => {
       if (!insideHostel) {
         return res.status(403).json({
           success: false,
+          errorType: "LOCATION",
           message: "You must be inside Cauvery Bhawan",
         });
       }
