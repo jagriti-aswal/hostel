@@ -31,7 +31,7 @@
 // };
 
 
-cron.schedule("06 22 * * *", async () => {
+cron.schedule("9 22 * * *", async () => {
   console.log("⏰ Running attendance reminder...");
   
   const today = new Date().toISOString().split("T")[0];
