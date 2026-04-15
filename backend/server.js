@@ -146,7 +146,7 @@ const app = express();
 app.set("trust proxy", true);
 
 // ==========================
-// ✅ CORS (FIXED PROPERLY)
+// ✅ CORS (FINAL FIX)
 // ==========================
 app.use(
   cors({
@@ -156,7 +156,8 @@ app.use(
   })
 );
 
-app.options("/*", cors());
+// ❌ REMOVE THIS (IMPORTANT)
+// app.options("/*", cors());
 
 // ==========================
 // ✅ BODY PARSERS
@@ -194,7 +195,7 @@ app.use("/api/auth", authRoutes);
 // Admin routes
 app.use("/api/admin", adminRoutes);
 
-// Attendance lock (only for attendance)
+// Attendance lock
 app.use("/api/face-attendance", networkLock);
 
 // Face attendance routes
