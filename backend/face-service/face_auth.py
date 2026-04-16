@@ -18,10 +18,6 @@ _ = DeepFace.represent(
 
 print("✅ Model loaded")
 
-
-# ============================
-# Base64 → OpenCV image
-# ============================
 def base64_to_image(image_base64):
     if "," in image_base64:
         image_base64 = image_base64.split(",")[1]

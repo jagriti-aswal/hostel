@@ -57,7 +57,7 @@ console.log("🔥 LOGIN PAGE LOADED");
         title: 'Invalid Institute Email',
         description:
           type === 'student'
-            ? 'Student email must be numeric (e.g. 12410923@nitkkr.ac.in)'
+            ? 'Student email must be numeric (e.g. 1241020`23@nitkkr.ac.in)'
             : 'Admin email must contain only letters (e.g. admin@nitkkr.ac.in)',
         variant: 'destructive',
       });
