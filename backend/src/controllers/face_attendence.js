@@ -4,11 +4,18 @@ import Attendance from "../models/Attendance.js";
 import * as geolib from "geolib";
 import Leave from "../models/Leave.js";
 // 📍 Cauvery Bhawan boundary (rectangle)
+// const hostelBoundary = [
+//   { latitude: 29.94520, longitude: 76.81420 },
+//   { latitude: 29.94520, longitude: 76.81510 },
+//   { latitude: 29.94460, longitude: 76.81510 },
+//   { latitude: 29.94460, longitude: 76.81420 }
+// ];
+//lhc
 const hostelBoundary = [
-  { latitude: 29.94520, longitude: 76.81420 },
-  { latitude: 29.94520, longitude: 76.81510 },
-  { latitude: 29.94460, longitude: 76.81510 },
-  { latitude: 29.94460, longitude: 76.81420 }
+  { latitude: 29.94610, longitude: 76.81720 },
+  { latitude: 29.94610, longitude: 76.81820 },
+  { latitude: 29.94540, longitude: 76.81820 },
+  { latitude: 29.94540, longitude: 76.81720 }
 ];
 
 export const markFaceAttendance = async (req, res) => {
