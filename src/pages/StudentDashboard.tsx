@@ -1,4 +1,4 @@
-const DEMO_MODE = true;
+// const DEMO_MODE = true;
 
 
 
@@ -345,7 +345,7 @@ const StudentDashboard: React.FC = () => {
   const [leaveTo, setLeaveTo] = useState("");
   const [reason, setReason] = useState("");
   const [isOnLeave, setIsOnLeave] = useState(false);
-  const [isDemo, setIsDemo] = useState(false);
+  // const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     if (userType !== "student") navigate("/");
@@ -409,14 +409,13 @@ const StudentDashboard: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (data.demo) {
-  setIsDemo(true);
-}      if (!res.ok || !data.success) throw new Error(data.message);
+//       if (data.demo) {
+//   setIsDemo(true);
+// }   
+   if (!res.ok || !data.success) throw new Error(data.message);
       setAttendanceMarked(true);
       toast({
-  title: data.demo
-    ? "⚠️ Demo Mode: Attendance marked"
-    : "Attendance Success", description: "Your attendance has been recorded.",
+  title: "Attendance marked successfully ✓",description: "Your attendance has been recorded.",
 });
     } catch (err: any) {
       toast({ title: "Verification Failed", description: err.message, variant: "destructive" });
@@ -487,7 +486,7 @@ const StudentDashboard: React.FC = () => {
           <h2 className="text-3xl font-extrabold text-slate-900">Student Dashboard</h2>
           <p className="text-slate-500 mt-1">Manage your daily attendance and leave requests effortlessly.</p>
         </header>
-
+{/* 
 {DEMO_MODE && (
   <div style={{
     background: "#ff4444",
@@ -498,7 +497,7 @@ const StudentDashboard: React.FC = () => {
   }}>
     ⚠️ DEMO MODE ACTIVE — Location & WiFi restrictions are disabled for testing
   </div>
-)}
+)} */}
 
   <div className="grid lg:grid-cols-12 gap-8">
           
