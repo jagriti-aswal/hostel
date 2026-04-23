@@ -1,9 +1,17 @@
+const DEMO_MODE = true;
 import axios from "axios";
 import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
 import * as geolib from "geolib";
 import Leave from "../models/Leave.js";
-// 📍 Cauvery Bhawan boundary (rectangle)
+// Cauvery Bhawan boundary (rectangle)
+// const hostelBoundary = [
+//   { latitude: 29.94520, longitude: 76.81420 },
+//   { latitude: 29.94520, longitude: 76.81510 },
+//   { latitude: 29.94460, longitude: 76.81510 },
+//   { latitude: 29.94460, longitude: 76.81420 }
+// ];
+
 // const hostelBoundary = [
 //   { latitude: 29.94520, longitude: 76.81420 },
 //   { latitude: 29.94520, longitude: 76.81510 },
@@ -42,18 +50,20 @@ export const markFaceAttendance = async (req, res) => {
 
     console.log("🌐 Client IP:", clientIP);
     // Example hostel WiFi IP pattern (adjust if needed)
-if (!clientIP.includes("10.") && !clientIP.includes("192.168")) {
+if (!DEMO_MODE && !clientIP.includes("10.") && !clientIP.includes("192.168")) {
   return res.status(403).json({
     success: false,
     errorType: "WIFI",
     message: "You are not connected to hostel WiFi",
   });
+} else if (DEMO_MODE) {
+  console.log("🟡 DEMO MODE → WiFi check skipped");
 }
 
     // ==========================
     // 📍 LOCATION (RECTANGLE CHECK)
     // ==========================
-    if (latitude && longitude) {
+    if (!DEMO_MODE && latitude && longitude) {
       const insideHostel = geolib.isPointInPolygon(
         { latitude: Number(latitude), longitude: Number(longitude) },
         hostelBoundary
@@ -68,7 +78,11 @@ if (!clientIP.includes("10.") && !clientIP.includes("192.168")) {
           message: "You must be inside Cauvery Bhawan",
         });
       }
-    } else {
+    }
+    else if (DEMO_MODE) {
+  console.log("🟡 DEMO MODE → Location check skipped");
+}
+    else {
       console.log("⚠️ Location not provided");
     }
 
@@ -183,9 +197,12 @@ if (leave) {
     });
 
     return res.json({
-      success: true,
-      message: "Attendance marked successfully",
-    });
+  success: true,
+  message: DEMO_MODE
+    ? "Attendance marked (Demo Mode)"
+    : "Attendance marked successfully",
+  demo: DEMO_MODE
+});
 
   } catch (error) {
     console.error("🔥 FULL ERROR:", error);

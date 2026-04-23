@@ -1,3 +1,4 @@
+const DEMO_MODE = true;
 
 
 
@@ -344,6 +345,7 @@ const StudentDashboard: React.FC = () => {
   const [leaveTo, setLeaveTo] = useState("");
   const [reason, setReason] = useState("");
   const [isOnLeave, setIsOnLeave] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     if (userType !== "student") navigate("/");
@@ -407,9 +409,15 @@ const StudentDashboard: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.message);
+      if (data.demo) {
+  setIsDemo(true);
+}      if (!res.ok || !data.success) throw new Error(data.message);
       setAttendanceMarked(true);
-      toast({ title: "Attendance Success", description: "Your attendance has been recorded." });
+      toast({
+  title: data.demo
+    ? "⚠️ Demo Mode: Attendance marked"
+    : "Attendance Success", description: "Your attendance has been recorded.",
+});
     } catch (err: any) {
       toast({ title: "Verification Failed", description: err.message, variant: "destructive" });
     } finally {
@@ -480,7 +488,19 @@ const StudentDashboard: React.FC = () => {
           <p className="text-slate-500 mt-1">Manage your daily attendance and leave requests effortlessly.</p>
         </header>
 
-        <div className="grid lg:grid-cols-12 gap-8">
+{DEMO_MODE && (
+  <div style={{
+    background: "#ff4444",
+    color: "white",
+    padding: "10px",
+    textAlign: "center",
+    fontWeight: "bold"
+  }}>
+    ⚠️ DEMO MODE ACTIVE — Location & WiFi restrictions are disabled for testing
+  </div>
+)}
+
+  <div className="grid lg:grid-cols-12 gap-8">
           
           {/* ATTENDANCE SECTION */}
           <div className="lg:col-span-7 space-y-6">
